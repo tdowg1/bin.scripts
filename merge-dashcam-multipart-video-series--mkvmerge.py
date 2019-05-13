@@ -46,8 +46,31 @@ def generateMkvmergeCmdln( fileArray, start, end ):
     return ("%s %s %s" % (cmdlnBuilding0, cmdlnBuilding1, cmdlnBuilding2) )
 
 
-def handleSingleOrEndOfASetFile( fileArray, start, end ):
-    pass
+def handleSingleFileOrEndOfASet( fileArray, start, end ):
+    if start == end:  # "if this is a solo..."
+        # basically noop.
+        print("# ^single file; no mkvmergeing to do.")
+
+    else:  # "if this is the last of a set..."
+        generatedFilename = generateMkvmergedFilename( fileArray[ start ] )
+
+        # check if generated filename already exists; wont overwrite (unless forced?)
+        generatedFilenameDNE = not os.path.isfile( generatedFilename )
+
+        #if generatedFilenameDNE: then continue here
+        if generatedFilenameDNE:
+            helpingNote = ("touch --reference %s %s" % ( fileArray[ start ], generatedFilename ) )
+            print( helpingNote )
+
+            cmdln = generateMkvmergeCmdln( fileArray, start, end )
+
+            if options.isDryRun:
+                print( cmdln )
+            else:
+                executeCommandLine( cmdln )
+        else:
+            print("# looks like an mkvmerge file already exists.  not doing anything.")
+
 
 
 import os
@@ -79,78 +102,24 @@ for i in range(0, len(files)):
         print("# ^looks like an already existing mkvmerge.\n")
         continue
 
-
     if i + 1 < len( files ):  # "if this isn't the last element in the list ..."
-
         if files[i + 1][ -7: ] == '001.MOV':  # "if this isnt the middle of a set..."
             # if got here, its either:
             #   - a solo; notify and do nothing more.
             #   - the last of a set; determine cmdln string and execute.
 
-
-            # handleSingleOrEndOfASetFile( files, beginningSetIndex, i )
-
-            if beginningSetIndex == i:  # "if this is a solo..."
-                # basically noop.
-                print("# ^single file; no mkvmergeing to do.")
-
-            else:  # "if this is the last of a set..."
-                generatedFilename = generateMkvmergedFilename( files[ beginningSetIndex ] )
-
-                # check if generated filename already exists; wont overwrite (unless forced?)
-                generatedFilenameDNE = not os.path.isfile( generatedFilename )
-
-                #if generatedFilenameDNE: then continue here
-                if generatedFilenameDNE:
-                    helpingNote = ("touch --reference %s %s" % ( files[ beginningSetIndex ], generatedFilename ) )
-                    print( helpingNote )
-
-                    cmdln = generateMkvmergeCmdln( files, beginningSetIndex, i )
-
-                    if options.isDryRun:
-                        print( cmdln )
-                    else:
-                       executeCommandLine( cmdln )
-                else:
-                    print("# looks like an mkvmerge file already exists.  not doing anything.")
+            handleSingleFileOrEndOfASet( files, beginningSetIndex, i )
 
             # forward progress:
             beginningSetIndex = i + 1
 
-
         else:
             print( "# ^files[i] is NOT solo ; it continues a set (inclusively).")
 
-
     else:  # "this is the last item in the list"
+        handleSingleFileOrEndOfASet( files, beginningSetIndex, i )
 
-        #### FROM HERE DOWN
-        if beginningSetIndex == i:  # "if this is a solo..."
-            # basically noop.
-            print("# ^single file; no mkvmergeing to do.")
-
-        else:  # "if this is the last of a set..."
-            generatedFilename = generateMkvmergedFilename( files[ beginningSetIndex ] )
-
-            # check if generated filename already exists; wont overwrite (unless forced?)
-            generatedFilenameDNE = not os.path.isfile( generatedFilename )
-
-            #if generatedFilenameDNE: then continue here
-            if generatedFilenameDNE:
-                helpingNote = ("touch --reference %s %s" % ( files[ beginningSetIndex ], generatedFilename ) )
-                print( helpingNote )
-
-                cmdln = generateMkvmergeCmdln( files, beginningSetIndex, i )
-
-                if options.isDryRun:
-                    print( cmdln )
-                else:
-                   executeCommandLine( cmdln )
-            else:
-                print("# looks like an mkvmerge file already exists.  not doing anything.")
-
-        #### FROM HERE UP...
-        # ... could convert to function since they indentical within both uses.
 
     print("")
+
 
