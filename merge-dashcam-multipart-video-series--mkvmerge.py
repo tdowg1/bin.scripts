@@ -8,6 +8,8 @@
 #  result in files that are the exact same kind from which they came.
 #  - allow specifying to overwrite already existing files that appear to be
 #  already merged created.
+#  - allow for option that sets lastmodified timestamp of merged file
+#   to be the same as the first one of the set.
 
 # ASSUMPTIONS :
 #  - not tested with spaces in specified path (the -p argument).
@@ -25,13 +27,12 @@ def executeCommandLine( command ):
     return rc
 
 
-# TODO s/basefilename/filename/globally (from the variable name, this was an incorrect assumption I made)
-def generateMkvmergedFilename( basefilename ):
-    return ("%s.%s" % (basefilename, G_MERGED_FILENAME_SUFFIX) )
+def generateMkvmergedFilename( filename ):
+    return ("%s.%s" % (filename, G_MERGED_FILENAME_SUFFIX) )
 
 # does the passed filename look like a merged file or a raw/original source file?
-def isMkvmergedFilename( basefilename ):
-    testSuffix = basefilename[ - len( G_MERGED_FILENAME_SUFFIX ) : ]
+def isMkvmergedFilename( filename ):
+    testSuffix = filename[ - len( G_MERGED_FILENAME_SUFFIX ) : ]
     isMkvmergedFilenameDisposition = testSuffix == G_MERGED_FILENAME_SUFFIX
     return isMkvmergedFilenameDisposition
 
