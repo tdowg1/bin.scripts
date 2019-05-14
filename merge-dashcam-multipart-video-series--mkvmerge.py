@@ -64,7 +64,7 @@ def handleSingleFileOrEndOfASet( fileArray, start, end ):
 
             cmdln = generateMkvmergeCmdln( fileArray, start, end )
 
-            if options.isDryRun:
+            if args.dry_run:
                 print( cmdln )
             else:
                 executeCommandLine( cmdln )
@@ -75,21 +75,27 @@ def handleSingleFileOrEndOfASet( fileArray, start, end ):
 
 import os
 import glob
-import optparse
+import argparse
+
 import shlex, subprocess
 
-parser = optparse.OptionParser()
-#parser.add_option("-p", "--path", help="path that contains mkvmerge-able files", dest="search_dir")
-parser.add_option("-p", "--path", help="path that contains mkvmerge-able files", dest="search_dir", default=".")
-parser.add_option("-n", help="dry-run; dont actually do anything, just show", action="store_true", dest="isDryRun", default=False)
 
-(options, arguments) = parser.parse_args()
+
+parser = argparse.ArgumentParser(
+    description="This script helps deal with merging dashcam videos")
+parser.add_argument('--path', '-p', default=os.path.curdir,
+                    help="path that contains mkvmerge-able files")
+parser.add_argument('--dry-run', '-n', action='store_true',
+                    help="dont actually do anything, just show")
+args = parser.parse_args()
 
 import pprint
-pprint.pprint(options)
+pprint.pprint(args)
 
-#files = filter(os.path.isfile, glob.glob(options.search_dir + "/*"))         # Python 2
-files = list( filter(os.path.isfile, glob.glob(options.search_dir + "/*")) )  # Python 3
+
+
+#files = filter(os.path.isfile, glob.glob(args.search_dir + "/*"))         # Python 2
+files = list( filter(os.path.isfile, glob.glob(args.path + "/*")) )  # Python 3
 files.sort(key=lambda x: os.path.getmtime(x))
 
 beginningSetIndex = 0
