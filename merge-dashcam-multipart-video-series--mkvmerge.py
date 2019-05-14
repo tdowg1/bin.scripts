@@ -88,8 +88,8 @@ parser.add_option("-n", help="dry-run; dont actually do anything, just show", ac
 import pprint
 pprint.pprint(options)
 
-#files = filter(os.path.isfile, glob.glob(options.search_dir + "*"))         # Python 2
-files = list( filter(os.path.isfile, glob.glob(options.search_dir + "*")) )  # Python 3
+#files = filter(os.path.isfile, glob.glob(options.search_dir + "/*"))         # Python 2
+files = list( filter(os.path.isfile, glob.glob(options.search_dir + "/*")) )  # Python 3
 files.sort(key=lambda x: os.path.getmtime(x))
 
 beginningSetIndex = 0
