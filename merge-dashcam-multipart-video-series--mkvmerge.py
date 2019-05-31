@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 
-# BUGS :
-#  - FIXED? overwrites already existing *.mkvmerged.mkv files when already exists, but not always...
-
-# IMPROVEMENTS :
+# IMPROVEMENT IDEAS :
 #  - seems like ffmpeg might be the proper tool to use, which appears to
 #  result in files that are the exact same kind from which they came.
 #  - allow specifying to overwrite already existing files that appear to be
@@ -94,7 +91,7 @@ pprint.pprint(args)
 
 
 
-#files = filter(os.path.isfile, glob.glob(args.search_dir + "/*"))         # Python 2
+#files = filter(os.path.isfile, glob.glob(args.search_dir + "/*"))    # Python 2
 files = list( filter(os.path.isfile, glob.glob(args.path + "/*")) )  # Python 3
 files.sort(key=lambda x: os.path.getmtime(x))
 

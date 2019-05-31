@@ -21,6 +21,7 @@ set -o pipefail                             # with pipefail enabled, the pipelin
 
 
 : ${handbrakeTranscodingProfileToUseDEFAULT:="AppleTV 3"}
+handbrakeTranscodingProfileToUseDEFAULT="AppleTV"
 
 
 f_usage(){
@@ -52,6 +53,12 @@ Program Dependancies:
 - HandBrakeCLI
 - mediainfo
 
+Enhancement Ideas:
+  - allow specifying to overwrite already existing files that appear to be
+  already merged created.
+  - allow for option that sets lastmodified timestamp of merged file
+  to be the same as the first one of the set.
+
 Examples:
   $scriptname  --maxWidthPx=1900
   $scriptname --maxHeightPx=1079
@@ -60,6 +67,7 @@ Examples:
   $scriptname --maxHeightPx=1079 --maxFps=29
   $scriptname --maxHeightPx=1079 --maxFps=29 --g_handbrakeTranscodingProfileToUse="AppleTV 3"
   $scriptname --maxHeightPx=1079 --maxFps=29 --g_handbrakeTranscodingProfileToUse=AppleTV
+  $scriptname --maxWidthPx=1950 --maxHeightPx=1950 --maxFps=30 --g_handbrakeTranscodingProfileToUse=AppleTV
 __usageHEREDOC__
    exit 1
 }
