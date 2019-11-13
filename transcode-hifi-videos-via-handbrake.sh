@@ -48,6 +48,9 @@ HandBrake profile(s) that were used.
               this will be transcoded.
 --g_handbrakeTranscodingProfileToUse
               The profile to use.  Default is "$handbrakeTranscodingProfileToUseDEFAULT"
+--resetLastModified
+              Sets lastmodified timestamp of newly created
+              transcoded file to be the same as the source file.
 
 Program Dependancies:
 - HandBrakeCLI
@@ -56,14 +59,12 @@ Program Dependancies:
 Enhancement Ideas:
   - allow specifying to overwrite already existing files that appear to be
   already merged created.
-  - allow for option that sets lastmodified timestamp of merged file
-  to be the same as the first one of the set.
 
 Examples:
   $scriptname  --maxWidthPx=1900
   $scriptname --maxHeightPx=1079
   $scriptname  --maxWidthPx=1900 --maxHeightPx=1079
-  $scriptname --maxFps=30
+  $scriptname --maxFps=30  --resetLastModified
   $scriptname --maxHeightPx=1079 --maxFps=29
   $scriptname --maxHeightPx=1079 --maxFps=29 --g_handbrakeTranscodingProfileToUse="AppleTV 3"
   $scriptname --maxHeightPx=1079 --maxFps=29 --g_handbrakeTranscodingProfileToUse=AppleTV
@@ -90,6 +91,10 @@ fi
 loopcount=0
 while [ "$#" -gt "0" ] ; do
    case $1 in
+      --resetLastModified) # specified like: -k, or like: --key
+         resetLastModified="TRUE"
+         shift
+         ;;
       -q|--quiet) # specified like: -k, or like: --key
          ISQUIET="TRUE"
          shift
@@ -132,6 +137,7 @@ done
 : ${maxWidthPx:=0}
 : ${maxHeightPx:=0}
 : ${maxFps:=0}
+: ${resetLastModified:=FALSE}
 
 # !!!  "g_"  -->  GLOBAL  VARIABLE  !!!
 # e.g.: "H.264 MKV 720p30"
@@ -162,14 +168,20 @@ fi
 
 function handleTranscoding(){
    local existingFile="$1"
+   local resetLastModified="$2"
    local generatedNewTranscodeFilename="$( generateNewTranscodeFilename "${existingFile}" )"
 
-   # lastly, check that a transcoded file hasnt been created for $existingFile already:
+   # check that a transcoded file hasnt been created for $existingFile already:
    if [[ ! -f "$generatedNewTranscodeFilename" ]] ; then
       #echo HandBrakeCLI --preset "${g_handbrakeTranscodingProfileToUse}" \
       HandBrakeCLI --preset "${g_handbrakeTranscodingProfileToUse}" \
          -i "$existingFile" \
          -o "$generatedNewTranscodeFilename"
+
+      if [[ "$resetLastModified" = "TRUE" ]] ; then
+         touch --reference="$existingFile" \
+            "$generatedNewTranscodeFilename"
+      fi
    fi
 }
 
@@ -189,7 +201,7 @@ function generateNewTranscodeFilename(){
    suffixMatchAttempt="${existingFile%%${suffixToMatch}}"
 
 
-   # firstly, check that $existingFile isnt a transcoded file:
+   # check that $existingFile isnt a transcoded file:
    if [[ ${#existingFile} -eq ${#suffixMatchAttempt} ]] ; then
       # $existingFile is NOT a transcoded file, at least not with $g_handbrakeTranscodingProfileToUse .
       local suffixToAdd="$suffixToMatch"
@@ -218,7 +230,7 @@ if [[ $maxWidthPx != 0 ]] ; then
       currFileWidth="$( mediainfo "$currFile" --Inform="Video;%Width%" )"
 
       if [[ $currFileWidth -gt $maxWidthPx ]] ; then
-         handleTranscoding "$currFile"
+         handleTranscoding "$currFile" "$resetLastModified"
       fi
    done
 fi
@@ -229,7 +241,7 @@ if [[ $maxHeightPx != 0 ]] ; then
       currFileHeight="$( mediainfo "$currFile" --Inform="Video;%Height%" )"
 
       if [[ $currFileHeight -gt $maxHeightPx ]] ; then
-         handleTranscoding "$currFile"
+         handleTranscoding "$currFile" "$resetLastModified"
       fi
    done
 fi
@@ -242,7 +254,7 @@ if [[ $maxFps != 0 ]] ; then
       currFileFps=${currFileFps%.*}
 
       if [[ $currFileFps -gt $maxFps ]] ; then
-         handleTranscoding "$currFile"
+         handleTranscoding "$currFile" "$resetLastModified"
       fi
    done
 fi
