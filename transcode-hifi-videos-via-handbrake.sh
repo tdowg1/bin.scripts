@@ -133,6 +133,8 @@ done
 : ${maxHeightPx:=0}
 : ${maxFps:=0}
 
+# !!!  "g_"  -->  GLOBAL  VARIABLE  !!!
+# e.g.: "H.264 MKV 720p30"
 : ${g_handbrakeTranscodingProfileToUse:="$handbrakeTranscodingProfileToUseDEFAULT"}
 
 
@@ -160,10 +162,24 @@ fi
 
 function handleTranscoding(){
    local existingFile="$1"
+   local generatedNewTranscodeFilename="$( generateNewTranscodeFilename "${existingFile}" )"
+
+   # lastly, check that a transcoded file hasnt been created for $existingFile already:
+   if [[ ! -f "$generatedNewTranscodeFilename" ]] ; then
+      #echo HandBrakeCLI --preset "${g_handbrakeTranscodingProfileToUse}" \
+      HandBrakeCLI --preset "${g_handbrakeTranscodingProfileToUse}" \
+         -i "$existingFile" \
+         -o "$generatedNewTranscodeFilename"
+   fi
+}
+
+function generateNewTranscodeFilename(){
+   local existingFile="$1"
 
    #local transcodedFilenameExtension="$( mediainfo "$existingFile" --Inform="General;%FileExtension%" )"
    # handbrake creates MP4 files:
    local transcodedFilenameExtension="mp4"
+   # e.g.: "H.264 MKV 720p30.mp4"
    local suffixToMatch="${g_handbrakeTranscodingProfileToUse}.${transcodedFilenameExtension}"
 
 
@@ -179,17 +195,14 @@ function handleTranscoding(){
       local suffixToAdd="$suffixToMatch"
 
       local generatedNewTranscodeFilename="$( basename "${existingFile}.${suffixToAdd}" )"
+      echo "${generatedNewTranscodeFilename}"
 
-      # lastly, check that a transcoded file hasnt been created for $existingFile already:
-      if [[ ! -f "$generatedNewTranscodeFilename" ]] ; then
-         #echo HandBrakeCLI --preset "${g_handbrakeTranscodingProfileToUse}" \
-         HandBrakeCLI --preset "${g_handbrakeTranscodingProfileToUse}" \
-            -i "$existingFile" \
-            -o "$generatedNewTranscodeFilename"
-      fi
+   else
+      # $existingFile IS     a transcoded file, and          with $g_handbrakeTranscodingProfileToUse .
+      echo "$( basename "$existingFile" )"
    fi
-
 }
+
 
 
 #
