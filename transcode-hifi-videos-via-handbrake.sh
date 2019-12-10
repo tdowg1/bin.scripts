@@ -178,10 +178,16 @@ function handleTranscoding(){
          -i "$existingFile" \
          -o "$generatedNewTranscodeFilename"
 
-      if [[ "$resetLastModified" = "TRUE" ]] ; then
-         touch --reference="$existingFile" \
-            "$generatedNewTranscodeFilename"
-      fi
+      #if [[ "$resetLastModified" = "TRUE" ]] ; then
+      #   touch --reference="$existingFile" \
+      #      "$generatedNewTranscodeFilename"
+      #fi
+   fi
+
+   # reset last modified timestamp regardless of whether it was just created or not:
+   if [[ "$resetLastModified" = "TRUE" ]] ; then
+      touch --reference="$existingFile" \
+         "$generatedNewTranscodeFilename"
    fi
 }
 
