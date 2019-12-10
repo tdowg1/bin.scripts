@@ -1,4 +1,4 @@
-#!/bin/bash -
+#!/bin/bash -p
 #===============================================================================
 #          FILE:  rardefault.sh
 #         USAGE:  rardefault.sh <thing to archive>
@@ -66,7 +66,15 @@ rardefault(){
    local fso="${1}"  # file system object
    fso="$( removetrailingslashes "${fso}" )"
 
-   rar a -m5 -r -rr4p -t -tsmca "${fso}.rar"  "${fso}"
+   if [[ -d "$fso" ]] ; then
+      #echo dir
+      rar a -m5 -r -rr4p -t -tsmca "${fso}.rar"  "${fso}"
+   elif [[ -f "$fso" ]] ; then
+      #echo file
+      rar a -m5 -rr4p -t -tsmca "${fso}.rar"  "${fso}"
+   else
+      echo "specified fso($fso) is not a file or directory; condition not handled. kbai"
+   fi
 }
 
 if [[ $# != 0 ]] ; then
