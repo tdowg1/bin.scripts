@@ -108,8 +108,10 @@ if args.show_m3us:
             print("NO  m3u : %s" % album)
     exit()
 
-
-_AUDIO_FILENAME_EXTENSIONS = ("mp3", "flac", "ogg", "m4a")
+# all formats supported by youtube-dl, for example:
+# "aac", "flac", "mp3", "m4a", "opus", "vorbis", or "wav";
+#_AUDIO_FILENAME_EXTENSIONS = ("mp3", "flac", "ogg", "m4a")
+_AUDIO_FILENAME_EXTENSIONS = ( "aac", "flac", "mp3", "m4a", "opus", "vorbis", "wav" )
 for album in dirs:
     existingM3uCount2 = len([f for f in os.listdir(album) if f.endswith('.m3u')])
     if existingM3uCount2 > 0:
