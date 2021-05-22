@@ -6,7 +6,8 @@
 
 # BUG :
 #  - FIXED it creates an empty .m3u file within directories which have no music files.
-#  - probably wont work as desired if music file extensions are mixed or upper-case.
+#
+#  - probably wont work as desired if music file extensions are MIXED OR UPPER-CASE.
 #      try implementing~:  if file.lower().endswith('.m3u'):<...>
 
 #  - FIXED its barfing (err... totally skipping over
@@ -42,20 +43,20 @@ def generateM3uFilePath(albumPath):
 parser = argparse.ArgumentParser(
     formatter_class=argparse.RawDescriptionHelpFormatter,
     description=textwrap.dedent('''\
-    Generates an 'm3u' for any music file(s) that exist within each direct/immediate subdirectory of the specified path, 
-    if an 'm3u' doesnt already exist.  So, by default, each subdirectory represents an album and path represents a 
-    collection of albums. 
-    
+    Generates an 'm3u' for any music file(s) that exist within each direct/immediate subdirectory of the specified path,
+    if an 'm3u' doesnt already exist.  So, by default, each subdirectory represents an album and path represents a
+    collection of albums.
+
     Examples:
         m3u-generator.py    -p Vin-Petrols-music-collection
         m3u-generator.py -s -p almond-activation-music
         m3u-generator.py    -p 'craigyferg-tunes/wassacominago CD1'  --only-one
         m3u-generator.py -o -p 'RLY-expensive-applesauce-albums/Improvised Turkish blue grass Disk 33'
-        
+
         # List subdirectories (albums) devoid of an 'm3u':
         m3u-generator.py -s -p  albanian-free-jazz/ | grep "NO  m3u" | sed 's/NO  m3u : //'
-        
-        # ^^This could be built on further by piping to xargs to generate an 'm3u' for, for instance, 
+
+        # ^^This could be built on further by piping to xargs to generate an 'm3u' for, for instance,
         # multi-disk releases:
         xargs -L 1 -I{}  m3u-generator.py --path '{}'
         '''))
